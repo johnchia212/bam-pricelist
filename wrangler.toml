@@ -1,0 +1,19 @@
+name = "bam-pricelist"
+compatibility_date = "2026-01-01"
+compatibility_flags = ["nodejs_compat"]
+pages_build_output_dir = "public"
+
+# R2 bucket binding for storing the live pricelist JSON.
+# The pricelist is read from and written to the object "pricelist.json" in
+# this bucket. You can update it two ways: (1) log in as Admin and use the
+# in-app Upload & Replace button, or (2) go to the Cloudflare dashboard ->
+# R2 -> bam-pricelist-data -> upload a pricelist.json file directly (must
+# match the same JSON schema the app produces).
+[[r2_buckets]]
+binding = "PRICELIST_R2"
+bucket_name = "bam-pricelist-data"
+
+# Secrets (set with `wrangler pages secret put <NAME>`, do NOT hardcode here):
+#   ADMIN_USERNAME   -> defaults to "Admin" if unset
+#   ADMIN_PASSWORD   -> defaults to "sniffy123!" if unset (CHANGE THIS IN PRODUCTION)
+#   SESSION_SECRET   -> random string used to sign session cookies (REQUIRED in production)

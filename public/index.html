@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>BAM Master Price List</title>
+<link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+
+<!-- LOGIN VIEW -->
+<div id="login-view" class="login-wrap">
+  <div class="login-card">
+    <div class="brand-logo">
+      <div class="brand-logo-word">BOLZONI</div>
+      <div class="brand-logo-rule"></div>
+      <div class="brand-logo-sub">GROUP</div>
+    </div>
+    <p class="login-sub">Master Price List — Restricted Access</p>
+    <form id="login-form">
+      <label for="username">Username</label>
+      <input type="text" id="username" name="username" autocomplete="username" required />
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" autocomplete="current-password" required />
+      <button type="submit">Sign In</button>
+      <p id="login-error" class="error-msg" hidden></p>
+    </form>
+  </div>
+</div>
+
+<!-- APP VIEW -->
+<div id="app-view" hidden>
+  <header class="app-header">
+    <div class="brand-logo small">
+      <div class="brand-logo-word">BOLZONI</div>
+      <div class="brand-logo-rule"></div>
+      <div class="brand-logo-sub">GROUP</div>
+    </div>
+    <div class="header-title">
+      <h1>Master Price List</h1>
+      <p class="subtitle">BOLZONI &nbsp;|&nbsp; AURAMO &nbsp;|&nbsp; MEYER &nbsp;|&nbsp; SILVERLINE</p>
+    </div>
+    <div class="header-actions">
+      <span id="whoami" class="whoami"></span>
+      <button id="admin-toggle" class="btn-ghost">Admin</button>
+      <button id="logout-btn" class="btn-ghost">Log Out</button>
+    </div>
+  </header>
+
+  <div id="admin-panel" class="admin-panel" hidden>
+    <div class="save-bar">
+      <button id="save-btn" class="btn-primary">Save</button>
+      <span id="save-status" class="upload-status"></span>
+    </div>
+
+    <h2>Load File</h2>
+    <p class="admin-note">Choose an Excel file (.xlsx) from your computer and load it into the app below. Nothing is published yet — click Save above once you're happy with it.</p>
+    <div class="upload-row">
+      <input type="file" id="upload-file" accept=".xlsx,.xls" />
+      <button id="load-file-btn" class="btn-primary">Load File</button>
+      <span id="upload-status" class="upload-status"></span>
+    </div>
+    <p id="data-meta" class="data-meta"></p>
+
+    <h2 class="add-item-heading">Add New Item</h2>
+    <p class="admin-note">Enter a new row directly. Pick an existing category or type a new one to create a section. This only adds it below — click Save above to publish it.</p>
+    <form id="add-item-form" class="add-item-form">
+      <div class="field">
+        <label for="ai-category">Category</label>
+        <select id="ai-category"></select>
+        <input type="text" id="ai-category-new" placeholder="New category name" hidden />
+      </div>
+      <div class="field">
+        <label for="ai-series">Series</label>
+        <input type="text" id="ai-series" />
+      </div>
+      <div class="field">
+        <label for="ai-model">Model *</label>
+        <input type="text" id="ai-model" required />
+      </div>
+      <div class="field">
+        <label for="ai-sap-pn">SAP P/N</label>
+        <input type="text" id="ai-sap-pn" />
+      </div>
+      <div class="field">
+        <label for="ai-capacity">Capacity / Load Centre</label>
+        <input type="text" id="ai-capacity" />
+      </div>
+      <div class="field">
+        <label for="ai-dimensions">Dimensions (mm)</label>
+        <input type="text" id="ai-dimensions" />
+      </div>
+      <div class="field">
+        <label for="ai-range">Range (mm)</label>
+        <input type="text" id="ai-range" />
+      </div>
+      <div class="field">
+        <label for="ai-weight">Weight (kg)</label>
+        <input type="number" step="any" id="ai-weight" />
+      </div>
+      <div class="field">
+        <label for="ai-et">E.T (mm)</label>
+        <input type="number" step="any" id="ai-et" />
+      </div>
+      <div class="field">
+        <label for="ai-hcg">HCG (mm)</label>
+        <input type="text" id="ai-hcg" />
+      </div>
+      <div class="field">
+        <label for="ai-mounting">Mounting Class</label>
+        <input type="text" id="ai-mounting" />
+      </div>
+      <div class="field">
+        <label for="ai-price">EXW Wuxi (RMB)</label>
+        <input type="number" step="any" id="ai-price" />
+      </div>
+      <div class="field field-wide">
+        <label for="ai-remarks">Remarks</label>
+        <input type="text" id="ai-remarks" />
+      </div>
+      <div class="field field-wide add-item-actions">
+        <button type="submit" class="btn-primary">Add Item</button>
+        <span id="add-item-status" class="upload-status"></span>
+      </div>
+    </form>
+  </div>
+
+  <div class="toolbar">
+    <input type="search" id="search-box" placeholder="Search model, SAP P/N, remarks..." />
+    <span id="result-count" class="result-count"></span>
+  </div>
+
+  <nav id="category-tabs" class="tabs"></nav>
+
+  <main id="results" class="results"></main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="/app.js"></script>
+</body>
+</html>
