@@ -1,0 +1,47 @@
+<svg viewBox="0 0 640 300" xmlns="http://www.w3.org/2000/svg">
+  <g>
+    <text x="14" y="160" font-family="Arial, 'Helvetica Neue', Helvetica, sans-serif" font-weight="900"
+          font-size="105" letter-spacing="-2" fill="#E2001A">BOLZONI</text>
+
+    <!-- abstract mark -->
+    <g transform="translate(508,18) scale(0.85)">
+      <!-- left crescent (open bracket shape) -->
+      <path d="M30 8
+               C 2 8 -10 40 -10 70
+               C -10 100 2 132 30 132
+               C 46 132 58 122 58 108
+               L 58 96
+               C 58 108 48 114 36 114
+               C 18 114 8 96 8 70
+               C 8 44 18 26 36 26
+               C 48 26 58 32 58 44
+               L 58 32
+               C 58 18 46 8 30 8 Z"
+            fill="#E2001A"/>
+
+      <!-- 2x2 checker squares -->
+      <rect x="24" y="82" width="16" height="16" fill="#8f1f1f"/>
+      <rect x="44" y="82" width="16" height="16" fill="#8f1f1f"/>
+      <rect x="24" y="102" width="16" height="16" fill="#8f1f1f"/>
+      <rect x="44" y="102" width="16" height="16" fill="#8f1f1f"/>
+
+      <!-- right flame -->
+      <path d="M78 132
+               C 60 132 60 8 84 8
+               C 108 8 122 40 122 70
+               C 122 104 104 132 78 132 Z"
+            fill="#E2001A"/>
+
+      <!-- small sliver flame -->
+      <path d="M112 4
+               C 100 20 100 46 112 58
+               C 122 40 122 18 112 4 Z"
+            fill="#E2001A"/>
+    </g>
+
+    <line x1="14" y1="188" x2="626" y2="188" stroke="#E2001A" stroke-width="3"/>
+
+    <text x="320" y="252" font-family="Arial, 'Helvetica Neue', Helvetica, sans-serif" font-weight="700"
+          font-size="46" letter-spacing="20" fill="#1a1a1a" text-anchor="middle">GROUP</text>
+  </g>
+</svg>
