@@ -299,6 +299,8 @@ body {
 .btn-tiny:hover { border-color: var(--red); color: var(--red-hover); }
 .btn-tiny-primary { background: var(--red); border-color: var(--red); color: var(--white); }
 .btn-tiny-primary:hover { background: var(--red-hover); border-color: var(--red-hover); color: var(--white); }
+.btn-tiny-danger { border-color: #8a2020; color: #ff8a8a; }
+.btn-tiny-danger:hover { background: #8a2020; border-color: #8a2020; color: var(--white); }
 .btn-tiny:disabled { opacity: 0.6; cursor: not-allowed; }
 tr.editing-row { background: var(--surface-2); }
 .edit-input {

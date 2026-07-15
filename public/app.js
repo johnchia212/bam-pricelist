@@ -8,6 +8,7 @@
   const adminToggle = document.getElementById("admin-toggle");
   const adminPanel = document.getElementById("admin-panel");
   const loadFileBtn = document.getElementById("load-file-btn");
+  const exportFileBtn = document.getElementById("export-file-btn");
   const uploadFile = document.getElementById("upload-file");
   const uploadStatus = document.getElementById("upload-status");
   const saveBtn = document.getElementById("save-btn");
@@ -154,6 +155,65 @@
       setUploadStatus("Failed to read file: " + err.message, "err");
     } finally {
       loadFileBtn.disabled = false;
+    }
+  });
+
+  // ---------- Export File (download current in-browser state as .xlsx) ----------
+  const EXPORT_HEADERS = [
+    "Series", "Model", "SAP P/N", "Capacity", "Dimensions", "Range",
+    "Weight (kg)", "E.T (mm)", "HCG (mm)", "Mounting Class",
+    "EXW Wuxi (RMB)", "Updated", "Remarks",
+  ];
+
+  function sanitizeSheetName(name, used) {
+    let clean = String(name || "Sheet").replace(/[:\\/?*\[\]]/g, "-").slice(0, 31);
+    if (!clean.trim()) clean = "Sheet";
+    let final = clean;
+    let n = 2;
+    while (used.has(final)) {
+      const suffix = ` (${n})`;
+      final = clean.slice(0, 31 - suffix.length) + suffix;
+      n++;
+    }
+    used.add(final);
+    return final;
+  }
+
+  exportFileBtn.addEventListener("click", () => {
+    if (!pricelist || !pricelist.categories.length) {
+      setUploadStatus("Nothing to export yet.", "err");
+      return;
+    }
+    try {
+      const wb = XLSX.utils.book_new();
+      const usedNames = new Set();
+      pricelist.categories.forEach((c) => {
+        const rows = [EXPORT_HEADERS];
+        c.items.forEach((it) => {
+          rows.push([
+            it.series ?? "",
+            it.model ?? "",
+            it.sap_pn ?? "",
+            it.capacity ?? "",
+            it.dimensions ?? "",
+            it.range ?? "",
+            it.weight_kg ?? "",
+            it.et_mm ?? "",
+            it.hcg_mm ?? "",
+            it.mounting_class ?? "",
+            it.price_rmb ?? "",
+            it.updated ?? "",
+            it.remarks ?? "",
+          ]);
+        });
+        const ws = XLSX.utils.aoa_to_sheet(rows);
+        XLSX.utils.book_append_sheet(wb, ws, sanitizeSheetName(c.category, usedNames));
+      });
+      const stamp = new Date().toISOString().slice(0, 10);
+      XLSX.writeFile(wb, `BAM_Pricelist_${stamp}.xlsx`);
+      setUploadStatus("Exported to Excel.", "ok");
+    } catch (err) {
+      setUploadStatus("Export failed: " + err.message, "err");
     }
   });
 
@@ -518,8 +578,26 @@
             editingKey = null;
             render();
           });
+          const deleteBtn = document.createElement("button");
+          deleteBtn.className = "btn-tiny btn-tiny-danger";
+          deleteBtn.textContent = "Delete";
+          deleteBtn.addEventListener("click", () => {
+            const label = it.model || "this item";
+            if (!confirm(`Delete "${label}" from "${c.category}"? This cannot be undone once saved.`)) return;
+            const realCat = pricelist.categories.find((cc) => cc.category === c.category);
+            const idx = realCat.items.indexOf(it);
+            if (idx !== -1) realCat.items.splice(idx, 1);
+            realCat.items.forEach((row, i) => (row._idx = i));
+            realCat.count = realCat.items.length;
+            pricelist.total_items = pricelist.categories.reduce((sum, cc) => sum + cc.items.length, 0);
+            editingKey = null;
+            renderTabs();
+            render();
+            markDirty();
+          });
           actionsTd.appendChild(updateBtn);
           actionsTd.appendChild(cancelBtn);
+          actionsTd.appendChild(deleteBtn);
         } else {
           const editBtn = document.createElement("button");
           editBtn.className = "btn-tiny";
