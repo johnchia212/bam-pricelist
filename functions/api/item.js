@@ -3,7 +3,7 @@ import { getSessionFromRequest, json } from "../_lib/auth.js";
 const ALLOWED_FIELDS = [
   "series", "model", "sap_pn", "capacity", "dimensions", "range",
   "weight_kg", "et_mm", "hcg_mm", "mounting_class", "price_rmb",
-  "updated", "remarks",
+  "input_date", "updated", "remarks",
 ];
 
 // Amend a single price list row in place. Identified by category name +

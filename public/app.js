@@ -40,6 +40,7 @@
     { key: "hcg_mm", label: "HCG (mm)", editable: true },
     { key: "mounting_class", label: "Mounting Class", editable: true },
     { key: "price_rmb", label: "EXW Wuxi (RMB)", editable: true, numeric: true },
+    { key: "input_date", label: "Input Date", editable: true, dateType: true },
     { key: "remarks", label: "Remarks", editable: true },
   ];
 
@@ -162,7 +163,7 @@
   const EXPORT_HEADERS = [
     "Series", "Model", "SAP P/N", "Capacity", "Dimensions", "Range",
     "Weight (kg)", "E.T (mm)", "HCG (mm)", "Mounting Class",
-    "EXW Wuxi (RMB)", "Updated", "Remarks",
+    "EXW Wuxi (RMB)", "Input Date", "Updated", "Remarks",
   ];
 
   function sanitizeSheetName(name, used) {
@@ -202,6 +203,7 @@
             it.hcg_mm ?? "",
             it.mounting_class ?? "",
             it.price_rmb ?? "",
+            it.input_date ?? "",
             it.updated ?? "",
             it.remarks ?? "",
           ]);
@@ -253,7 +255,7 @@
   const UPLOAD_HEADERS = [
     "series", "model", "sap_pn", "capacity", "dimensions", "range",
     "weight_kg", "et_mm", "hcg_mm", "mounting_class", "price_rmb",
-    "updated", "remarks",
+    "input_date", "updated", "remarks",
   ];
 
   function cleanUploadValue(v) {
@@ -390,6 +392,7 @@
       hcg_mm: strOrNull("ai-hcg"),
       mounting_class: strOrNull("ai-mounting"),
       price_rmb: numOrNull("ai-price"),
+      input_date: strOrNull("ai-input-date"),
       remarks: strOrNull("ai-remarks"),
       category,
       updated: new Date().toISOString().slice(0, 10),
@@ -530,8 +533,8 @@
           td.setAttribute("data-label", col.label);
           if (isEditing && col.editable) {
             const input = document.createElement("input");
-            input.type = col.numeric ? "number" : "text";
-            input.step = "any";
+            input.type = col.dateType ? "date" : col.numeric ? "number" : "text";
+            if (col.numeric) input.step = "any";
             input.className = "edit-input";
             input.dataset.field = col.key;
             input.value = it[col.key] ?? "";
