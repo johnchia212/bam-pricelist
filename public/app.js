@@ -571,13 +571,18 @@
           } else if (col.key === "price_rmb") {
             td.className = "price-cell";
             td.textContent = fmtPrice(it.price_rmb);
+            if (td.textContent !== "—") td.title = td.textContent;
           } else if (col.key === "remarks") {
             td.className = "remarks-cell";
             td.textContent = it.remarks || "—";
+            if (it.remarks) td.title = it.remarks;
           } else if (col.dateType) {
             td.textContent = fmtDate(it[col.key]) || "—";
           } else {
             td.textContent = it[col.key] ?? "—";
+            if (it[col.key] !== null && it[col.key] !== undefined && it[col.key] !== "") {
+              td.title = String(it[col.key]);
+            }
           }
           tr.appendChild(td);
         });
