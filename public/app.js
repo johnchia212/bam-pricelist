@@ -32,7 +32,7 @@
   const COLUMNS = [
     { key: "model", label: "Model", editable: true },
     { key: "sap_pn", label: "SAP P/N", editable: true },
-    { key: "capacity", label: "Capacity (kg) / Load Centre (mm)", editable: true },
+    { key: "capacity", label: "Cap. (kg) / LC (mm)", editable: true },
     { key: "dimensions", label: "Dimensions (mm)", editable: true },
     { key: "range", label: "Range (mm)", editable: true },
     { key: "weight_kg", label: "Weight (kg)", editable: true, numeric: true },
