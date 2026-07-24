@@ -51,6 +51,35 @@
     return n.toLocaleString("en-US", { maximumFractionDigits: 2 }) + " ¥";
   }
 
+  // Accepts an ISO-ish date string (YYYY-MM-DD or a full timestamp) and
+  // returns DD/MM/YYYY. Anything it can't parse is returned unchanged.
+  function fmtDate(v) {
+    if (v === null || v === undefined || v === "") return "";
+    const s = String(v).trim();
+    const isoMatch = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (isoMatch) {
+      const [, y, m, d] = isoMatch;
+      return `${d}/${m}/${y}`;
+    }
+    const dt = new Date(s);
+    if (!Number.isNaN(dt.getTime())) {
+      const d = String(dt.getDate()).padStart(2, "0");
+      const m = String(dt.getMonth() + 1).padStart(2, "0");
+      const y = dt.getFullYear();
+      return `${d}/${m}/${y}`;
+    }
+    return s;
+  }
+
+  function fmtDateTime(v) {
+    if (!v) return "—";
+    const dt = new Date(v);
+    if (Number.isNaN(dt.getTime())) return String(v);
+    const datePart = fmtDate(dt.toISOString());
+    const timePart = dt.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
+    return `${datePart}, ${timePart}`;
+  }
+
   function markDirty() {
     dirty = true;
     saveStatus.textContent = "Unsaved changes";
@@ -203,8 +232,8 @@
             it.hcg_mm ?? "",
             it.mounting_class ?? "",
             it.price_rmb ?? "",
-            it.input_date ?? "",
-            it.updated ?? "",
+            fmtDate(it.input_date),
+            fmtDate(it.updated),
             it.remarks ?? "",
           ]);
         });
@@ -304,7 +333,7 @@
   }
 
   function updateDataMeta() {
-    dataMeta.textContent = `Source: ${pricelist.source_file || "—"} · ${pricelist.total_items} items · Updated ${pricelist.generated_at ? new Date(pricelist.generated_at).toLocaleString() : "—"}`;
+    dataMeta.textContent = `Source: ${pricelist.source_file || "—"} · ${pricelist.total_items} items · Updated ${fmtDateTime(pricelist.generated_at)}`;
   }
 
   function tagItemIndexes() {
@@ -545,6 +574,8 @@
           } else if (col.key === "remarks") {
             td.className = "remarks-cell";
             td.textContent = it.remarks || "—";
+          } else if (col.dateType) {
+            td.textContent = fmtDate(it[col.key]) || "—";
           } else {
             td.textContent = it[col.key] ?? "—";
           }
