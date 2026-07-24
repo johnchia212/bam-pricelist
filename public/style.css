@@ -331,7 +331,7 @@ tr.editing-row { background: var(--surface-2); }
 }
 .category-block h3 .cat-count { color: var(--grey); font-weight: 400; text-transform: none; }
 
-table { width: 100%; border-collapse: collapse; font-size: 13px; table-layout: fixed; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; table-layout: auto; }
 thead th {
   text-align: left;
   padding: 10px 8px;
@@ -343,9 +343,6 @@ thead th {
   border-bottom: 1px solid var(--border);
   cursor: pointer;
   white-space: nowrap;
-  max-width: 20ch;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 thead th:hover { color: var(--red-hover); }
 tbody td {
@@ -353,14 +350,18 @@ tbody td {
   border-bottom: 1px solid var(--border);
   vertical-align: top;
   color: var(--text);
-  max-width: 20ch;
-  overflow: hidden;
-  text-overflow: ellipsis;
   white-space: nowrap;
 }
 tbody tr:hover { background: var(--surface-2); }
 .price-cell { font-weight: 700; white-space: nowrap; color: var(--text); }
-.remarks-cell { color: var(--grey); font-size: 12px; }
+.remarks-cell {
+  color: var(--grey);
+  font-size: 12px;
+  max-width: 60ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .empty-state { color: var(--grey); text-align: center; padding: 60px 0; font-size: 14px; }
 
 @media (max-width: 720px) {
