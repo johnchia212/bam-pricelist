@@ -653,6 +653,8 @@
       table.appendChild(tbody);
       block.appendChild(table);
       resultsEl.appendChild(block);
+
+      thead.style.top = h3.offsetHeight + "px";
     });
   }
 

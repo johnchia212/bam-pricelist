@@ -15,11 +15,27 @@
 
 * { box-sizing: border-box; }
 
+html, body {
+  height: 100%;
+}
 body {
   margin: 0;
   font-family: var(--font);
   color: var(--text);
   background: var(--bg);
+}
+
+#app-view {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+.app-header,
+.toolbar,
+.tabs,
+.admin-panel {
+  flex-shrink: 0;
 }
 
 /* ---------- Brand mark ---------- */
@@ -306,19 +322,25 @@ tr.editing-row { background: var(--surface-2); }
 .edit-input:focus { outline: none; }
 
 /* ---------- Results ---------- */
-.results { padding: 0 32px 48px; }
+.results { flex: 1 1 auto; overflow-y: auto; min-height: 0; padding: 0 32px 48px; }
 .category-block { margin-bottom: 36px; }
 .category-block h3 {
   font-size: 14px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   border-bottom: 2px solid var(--red);
-  padding-bottom: 8px;
-  margin-bottom: 0;
+  padding: 12px 0 8px;
+  margin: 0;
   display: flex;
   justify-content: space-between;
   color: var(--text);
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  background: var(--bg);
 }
+thead { position: sticky; z-index: 2; background: var(--bg); }
+thead th { background: var(--bg); }
 .category-block h3 .cat-count { color: var(--grey); font-weight: 400; text-transform: none; }
 
 table { width: 100%; border-collapse: collapse; font-size: 13px; table-layout: auto; }
