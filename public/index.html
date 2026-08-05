@@ -11,18 +11,17 @@
 <!-- LOGIN VIEW -->
 <div id="login-view" class="login-wrap">
   <div class="login-card">
-    <div class="brand-logo">
-      <div class="brand-logo-word">BOLZONI</div>
-      <div class="brand-logo-rule"></div>
-      <div class="brand-logo-sub">PRICELIST</div>
-    </div>
-    <p class="login-sub">Master Price List — Restricted Access</p>
+    <img src="/bolzoni-logo.png" alt="Bolzoni Group" class="login-logo" />
+    <h2 class="login-heading">Master Pricelist</h2>
     <form id="login-form">
-      <label for="username">Username</label>
-      <input type="text" id="username" name="username" autocomplete="username" required />
-      <label for="password">Password</label>
-      <input type="password" id="password" name="password" autocomplete="current-password" required />
-      <button type="submit">Sign In</button>
+      <label for="username" class="sr-only">Username</label>
+      <input type="text" id="username" name="username" placeholder="Username" autocomplete="username" required />
+      <label for="password" class="sr-only">Password</label>
+      <input type="password" id="password" name="password" placeholder="Password" autocomplete="current-password" required />
+      <button type="submit" class="login-btn">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+        Login
+      </button>
       <p id="login-error" class="error-msg" hidden></p>
     </form>
   </div>
@@ -31,11 +30,7 @@
 <!-- APP VIEW -->
 <div id="app-view" hidden>
   <header class="app-header">
-    <div class="brand-logo small">
-      <div class="brand-logo-word">BOLZONI</div>
-      <div class="brand-logo-rule"></div>
-      <div class="brand-logo-sub">PRICELIST</div>
-    </div>
+    <img src="/bolzoni-logo.png" alt="Bolzoni Group" class="header-logo" />
     <div class="header-title">
       <h1>Master Price List</h1>
       <p class="subtitle">BOLZONI &nbsp;|&nbsp; AURAMO &nbsp;|&nbsp; MEYER</p>

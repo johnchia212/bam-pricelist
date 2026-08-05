@@ -88,6 +88,29 @@ body {
 .brand-logo.small .brand-logo-rule { margin: 5px 0 4px; }
 .brand-logo.small .brand-logo-sub { font-size: 8px; letter-spacing: 4px; margin-left: 4px; }
 
+.login-logo { display: block; margin: 0 auto 22px; width: 220px; height: auto; }
+.login-heading {
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  margin: 0 0 28px;
+  text-align: center;
+}
+.header-logo { height: 34px; width: auto; display: block; }
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 /* ---------- Login ---------- */
 .login-wrap {
   min-height: 100vh;
@@ -123,28 +146,32 @@ body {
 }
 .login-card input {
   width: 100%;
-  padding: 10px 12px;
-  border: 1px solid var(--border);
-  background: var(--surface-2);
-  color: var(--text);
+  padding: 13px 16px;
+  border: none;
+  border-radius: 8px;
+  background: #F4F3C4;
+  color: #3a3a24;
   font-size: 14px;
   font-family: var(--font);
 }
-.login-card input:focus { outline: none; border-color: var(--red); }
+.login-card input::placeholder { color: #8a8a68; }
+.login-card input:focus { outline: none; box-shadow: 0 0 0 2px var(--red); }
 .login-card button {
   width: 100%;
   margin-top: 24px;
-  padding: 12px;
+  padding: 13px;
   background: var(--red);
   color: var(--white);
   border: none;
-  font-weight: 700;
+  border-radius: 8px;
+  font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 1px;
   cursor: pointer;
   font-size: 13px;
 }
 .login-card button:hover { background: var(--red-hover); }
+.login-btn { display: flex; align-items: center; justify-content: center; gap: 8px; }
 .error-msg { color: var(--red-hover); font-size: 13px; margin-top: 14px; text-align: center; }
 
 /* ---------- App shell ---------- */
