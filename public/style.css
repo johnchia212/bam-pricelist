@@ -153,12 +153,13 @@ body {
   color: #3a3a24;
   font-size: 14px;
   font-family: var(--font);
+  margin-bottom: 14px;
 }
 .login-card input::placeholder { color: #8a8a68; }
 .login-card input:focus { outline: none; box-shadow: 0 0 0 2px var(--red); }
 .login-card button {
   width: 100%;
-  margin-top: 24px;
+  margin-top: 10px;
   padding: 13px;
   background: var(--red);
   color: var(--white);
