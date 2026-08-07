@@ -228,6 +228,13 @@ body {
   gap: 6px;
   width: 110px;
 }
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+.upload-filename { color: var(--grey); font-size: 12px; }
 
 .admin-panel h2 { margin: 0 0 4px; font-size: 15px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text); }
 .admin-note { color: var(--grey); font-size: 12px; margin: 0 0 14px; }

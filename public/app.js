@@ -5,11 +5,12 @@
   const loginError = document.getElementById("login-error");
   const whoami = document.getElementById("whoami");
   const logoutBtn = document.getElementById("logout-btn");
-  const adminToggle = document.getElementById("admin-toggle");
-  const adminPanel = document.getElementById("admin-panel");
+  const addItemToggle = document.getElementById("add-item-toggle");
+  const addItemPanel = document.getElementById("add-item-panel");
   const loadFileBtn = document.getElementById("load-file-btn");
   const exportFileBtn = document.getElementById("export-file-btn");
   const uploadFile = document.getElementById("upload-file");
+  const uploadFilename = document.getElementById("upload-filename");
   const uploadStatus = document.getElementById("upload-status");
   const saveBtn = document.getElementById("save-btn");
   const saveStatus = document.getElementById("save-status");
@@ -147,8 +148,13 @@
     showLogin();
   });
 
-  adminToggle.addEventListener("click", () => {
-    adminPanel.hidden = !adminPanel.hidden;
+  addItemToggle.addEventListener("click", () => {
+    addItemPanel.hidden = !addItemPanel.hidden;
+  });
+
+  uploadFile.addEventListener("change", () => {
+    const file = uploadFile.files[0];
+    uploadFilename.textContent = file ? file.name : "No file selected";
   });
 
   // ---------- Load File (local only, does not touch R2) ----------
