@@ -31,7 +31,10 @@
   const usUsername = document.getElementById("us-username");
   const usPassword = document.getElementById("us-password");
   const usRole = document.getElementById("us-role");
+  const usSaveBtn = document.getElementById("us-save-btn");
+  const usAddBtn = document.getElementById("us-add-btn");
   const userSettingsStatus = document.getElementById("user-settings-status");
+  let knownUsernames = [];
 
   let pricelist = null;
   let sortState = { key: null, dir: 1 };
@@ -193,6 +196,7 @@
         return;
       }
       userList.innerHTML = "";
+      knownUsernames = data.users.map((u) => u.username.toLowerCase());
       data.users.forEach((u) => {
         const row = document.createElement("div");
         row.className = "user-list-item";
@@ -210,19 +214,40 @@
     if (!userSettingsPanel.hidden) loadUserList();
   });
 
-  userSettingsForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
+  async function submitUser(mode) {
+    const username = usUsername.value.trim();
+    const password = usPassword.value;
+    const role = usRole.value;
+
+    if (!username) {
+      userSettingsStatus.textContent = "Username is required.";
+      userSettingsStatus.className = "upload-status err";
+      return;
+    }
+    if (!password || password.length < 6) {
+      userSettingsStatus.textContent = "Password must be at least 6 characters.";
+      userSettingsStatus.className = "upload-status err";
+      return;
+    }
+    const exists = knownUsernames.includes(username.toLowerCase());
+    if (mode === "save" && !exists) {
+      userSettingsStatus.textContent = `No existing user named "${username}" — use Add User to create one.`;
+      userSettingsStatus.className = "upload-status err";
+      return;
+    }
+    if (mode === "add" && exists) {
+      userSettingsStatus.textContent = `"${username}" already exists — use Save User to update them.`;
+      userSettingsStatus.className = "upload-status err";
+      return;
+    }
+
     userSettingsStatus.textContent = "Saving…";
     userSettingsStatus.className = "upload-status";
     try {
       const res = await fetch("/api/users", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          username: usUsername.value.trim(),
-          password: usPassword.value,
-          role: usRole.value,
-        }),
+        body: JSON.stringify({ username, password, role }),
       });
       const data = await res.json();
       if (!res.ok || !data.ok) {
@@ -230,17 +255,19 @@
         userSettingsStatus.className = "upload-status err";
         return;
       }
-      userSettingsStatus.textContent = `Saved "${usUsername.value.trim()}".`;
-      userSettingsStatus.className = "upload-status ok";
       usUsername.value = "";
       usPassword.value = "";
       usRole.value = "user";
-      loadUserList();
+      userSettingsStatus.textContent = "";
+      userSettingsPanel.hidden = true;
     } catch (err) {
       userSettingsStatus.textContent = "Failed to save user: " + err.message;
       userSettingsStatus.className = "upload-status err";
     }
-  });
+  }
+
+  usSaveBtn.addEventListener("click", () => submitUser("save"));
+  usAddBtn.addEventListener("click", () => submitUser("add"));
 
   // ---------- Load File (local only, does not touch R2) ----------
   loadFileBtn.addEventListener("click", async () => {
@@ -537,6 +564,7 @@
     render();
     setAddItemStatus(`Added to "${category}" — not yet saved.`, "ok");
     markDirty();
+    addItemPanel.hidden = true;
   });
 
   function setAddItemStatus(msg, cls) {

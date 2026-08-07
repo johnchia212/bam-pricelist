@@ -143,7 +143,7 @@
       <div class="field field-wide add-item-actions">
         <button type="submit" class="btn-primary btn-icon">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          Add Item
+          Save
         </button>
         <span id="add-item-status" class="upload-status"></span>
       </div>
@@ -158,11 +158,11 @@
     <form id="user-settings-form" class="add-item-form">
       <div class="field">
         <label for="us-username">Username</label>
-        <input type="text" id="us-username" required />
+        <input type="text" id="us-username" />
       </div>
       <div class="field">
         <label for="us-password">Password</label>
-        <input type="password" id="us-password" required minlength="6" />
+        <input type="password" id="us-password" />
       </div>
       <div class="field">
         <label for="us-role">Access</label>
@@ -172,9 +172,13 @@
         </select>
       </div>
       <div class="field field-wide add-item-actions">
-        <button type="submit" class="btn-primary btn-icon">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <button type="button" id="us-save-btn" class="btn-primary btn-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
           Save User
+        </button>
+        <button type="button" id="us-add-btn" class="btn-primary btn-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add User
         </button>
         <span id="user-settings-status" class="upload-status"></span>
       </div>
