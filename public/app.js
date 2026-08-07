@@ -37,6 +37,7 @@
   const usRole = document.getElementById("us-role");
   const usSubmitBtn = document.getElementById("us-submit-btn");
   const usSubmitLabel = document.getElementById("us-submit-label");
+  const usCancelBtn = document.getElementById("us-cancel-btn");
   const userSettingsStatus = document.getElementById("user-settings-status");
 
   let pricelist = null;
@@ -229,7 +230,7 @@
       usUsername.disabled = true;
       usPassword.value = "";
       usRole.value = user.role;
-      usSubmitLabel.textContent = "Save Changes";
+      usSubmitLabel.textContent = "Update";
     } else {
       usUsername.value = "";
       usUsername.disabled = false;
@@ -308,6 +309,10 @@
 
   usEditUserBtn.addEventListener("click", () => showUserList());
   usAddUserBtn.addEventListener("click", () => showUserForm("add"));
+  usCancelBtn.addEventListener("click", () => {
+    if (userFormMode === "edit") showUserList();
+    else showUserMenu();
+  });
 
   usSubmitBtn.addEventListener("click", async () => {
     const username = usUsername.value.trim();
@@ -820,7 +825,7 @@
             markDirty();
           });
           const cancelBtn = document.createElement("button");
-          cancelBtn.className = "btn-tiny";
+          cancelBtn.className = "btn-tiny btn-tiny-orange";
           cancelBtn.textContent = "Cancel";
           cancelBtn.addEventListener("click", () => {
             editingKey = null;

@@ -3,6 +3,8 @@
   --red-hover: #ff1a4d;
   --green: #1E8E3E;
   --green-hover: #27a84a;
+  --orange: #E8871E;
+  --orange-hover: #ff9d33;
   --black: #000000;
   --grey: #9a9a9a;
   --grey-dim: #6e6e6e;
@@ -216,6 +218,8 @@ body {
 .btn-primary:disabled { background: var(--grey-dim); cursor: not-allowed; }
 .btn-green { background: var(--green); }
 .btn-green:hover { background: var(--green-hover); }
+.btn-orange { background: var(--orange); }
+.btn-orange:hover { background: var(--orange-hover); }
 
 /* ---------- Admin panel ---------- */
 .admin-panel {
@@ -371,12 +375,14 @@ body {
   margin-left: 6px;
 }
 .btn-tiny:hover { border-color: var(--red); color: var(--red-hover); }
-.btn-tiny-primary { background: var(--red); border-color: var(--red); color: var(--white); }
-.btn-tiny-primary:hover { background: var(--red-hover); border-color: var(--red-hover); color: var(--white); }
-.btn-tiny-danger { background: var(--red); border-color: var(--red); color: var(--white); display: inline-flex; align-items: center; gap: 4px; }
-.btn-tiny-danger:hover { background: var(--red-hover); border-color: var(--red-hover); color: var(--white); }
-.btn-tiny-green { background: var(--green); border-color: var(--green); color: var(--white); display: inline-flex; align-items: center; gap: 4px; }
-.btn-tiny-green:hover { background: var(--green-hover); border-color: var(--green-hover); color: var(--white); }
+.btn-tiny-primary { background: none; border-color: var(--red); color: var(--red-hover); }
+.btn-tiny-primary:hover { background: var(--red); border-color: var(--red); color: var(--white); }
+.btn-tiny-danger { background: none; border-color: var(--red); color: var(--red-hover); display: inline-flex; align-items: center; gap: 4px; }
+.btn-tiny-danger:hover { background: var(--red); border-color: var(--red); color: var(--white); }
+.btn-tiny-green { background: none; border-color: var(--green); color: var(--green-hover); display: inline-flex; align-items: center; gap: 4px; }
+.btn-tiny-green:hover { background: var(--green); border-color: var(--green); color: var(--white); }
+.btn-tiny-orange { background: none; border-color: var(--orange); color: var(--orange-hover); }
+.btn-tiny-orange:hover { background: var(--orange); border-color: var(--orange); color: var(--white); }
 .btn-tiny:disabled { opacity: 0.6; cursor: not-allowed; }
 tr.editing-row { background: var(--surface-2); }
 .edit-input {
