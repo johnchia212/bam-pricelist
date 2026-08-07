@@ -21,6 +21,7 @@
   const resultsEl = document.getElementById("results");
   const addItemForm = document.getElementById("add-item-form");
   const addItemStatus = document.getElementById("add-item-status");
+  const addItemCancelBtn = document.getElementById("add-item-cancel-btn");
   const aiCategory = document.getElementById("ai-category");
   const aiCategoryNew = document.getElementById("ai-category-new");
   const adminPanel = document.getElementById("admin-panel");
@@ -191,6 +192,13 @@
 
   addItemToggle.addEventListener("click", () => {
     addItemPanel.hidden = !addItemPanel.hidden;
+  });
+
+  addItemCancelBtn.addEventListener("click", () => {
+    addItemForm.reset();
+    addItemStatus.textContent = "";
+    addItemStatus.className = "upload-status";
+    addItemPanel.hidden = true;
   });
 
   uploadFile.addEventListener("change", () => {
@@ -806,7 +814,7 @@
         if (isEditing) {
           const updateBtn = document.createElement("button");
           updateBtn.className = "btn-tiny btn-tiny-primary";
-          updateBtn.textContent = "Update";
+          updateBtn.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Update';
           updateBtn.addEventListener("click", () => {
             const inputs = tr.querySelectorAll(".edit-input");
             inputs.forEach((inp) => {
@@ -826,7 +834,7 @@
           });
           const cancelBtn = document.createElement("button");
           cancelBtn.className = "btn-tiny btn-tiny-orange";
-          cancelBtn.textContent = "Cancel";
+          cancelBtn.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Cancel';
           cancelBtn.addEventListener("click", () => {
             editingKey = null;
             render();

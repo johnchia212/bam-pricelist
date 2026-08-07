@@ -301,10 +301,10 @@ body {
 }
 .add-item-form input:focus,
 .add-item-form select:focus { outline: none; border-color: var(--red); }
-.add-item-actions { display: flex; flex-direction: row; align-items: center; gap: 12px; grid-column: span 2; }
+.add-item-form .add-item-actions { display: flex; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 12px; grid-column: span 2; }
 @media (max-width: 900px) {
   .add-item-form { grid-template-columns: repeat(2, 1fr); }
-  .add-item-form .field-wide, .add-item-actions { grid-column: span 2; }
+  .add-item-form .field-wide, .add-item-form .add-item-actions { grid-column: span 2; }
 }
 
 /* ---------- Toolbar ---------- */
@@ -364,6 +364,12 @@ body {
 /* ---------- Row editing ---------- */
 .actions-cell { white-space: nowrap; text-align: right; max-width: none; overflow: visible; }
 .btn-tiny {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: 86px;
+  white-space: nowrap;
   background: none;
   border: 1px solid var(--grey-dim);
   color: var(--text);
@@ -377,9 +383,9 @@ body {
 .btn-tiny:hover { border-color: var(--red); color: var(--red-hover); }
 .btn-tiny-primary { background: none; border-color: var(--red); color: var(--red-hover); }
 .btn-tiny-primary:hover { background: var(--red); border-color: var(--red); color: var(--white); }
-.btn-tiny-danger { background: none; border-color: var(--red); color: var(--red-hover); display: inline-flex; align-items: center; gap: 4px; }
+.btn-tiny-danger { background: none; border-color: var(--red); color: var(--red-hover); }
 .btn-tiny-danger:hover { background: var(--red); border-color: var(--red); color: var(--white); }
-.btn-tiny-green { background: none; border-color: var(--green); color: var(--green-hover); display: inline-flex; align-items: center; gap: 4px; }
+.btn-tiny-green { background: none; border-color: var(--green); color: var(--green-hover); }
 .btn-tiny-green:hover { background: var(--green); border-color: var(--green); color: var(--white); }
 .btn-tiny-orange { background: none; border-color: var(--orange); color: var(--orange-hover); }
 .btn-tiny-orange:hover { background: var(--orange); border-color: var(--orange); color: var(--white); }
