@@ -40,6 +40,9 @@
   const usSubmitLabel = document.getElementById("us-submit-label");
   const usCancelBtn = document.getElementById("us-cancel-btn");
   const userSettingsStatus = document.getElementById("user-settings-status");
+  const usMenuCancelBtn = document.getElementById("us-menu-cancel-btn");
+  const userListActions = document.getElementById("user-list-actions");
+  const usListCancelBtn = document.getElementById("us-list-cancel-btn");
 
   let pricelist = null;
   let sortState = { key: null, dir: 1 };
@@ -191,7 +194,7 @@
   });
 
   addItemToggle.addEventListener("click", () => {
-    addItemPanel.hidden = !addItemPanel.hidden;
+    addItemPanel.hidden = false;
   });
 
   addItemCancelBtn.addEventListener("click", () => {
@@ -216,6 +219,7 @@
   function showUserMenu() {
     userSettingsMenu.hidden = false;
     userList.hidden = true;
+    userListActions.hidden = true;
     userSettingsForm.hidden = true;
     userSettingsStatus.textContent = "";
   }
@@ -223,6 +227,7 @@
   function showUserList() {
     userSettingsMenu.hidden = true;
     userList.hidden = false;
+    userListActions.hidden = false;
     userSettingsForm.hidden = true;
     loadUserList();
   }
@@ -230,6 +235,7 @@
   function showUserForm(mode, user) {
     userSettingsMenu.hidden = true;
     userList.hidden = true;
+    userListActions.hidden = true;
     userSettingsForm.hidden = false;
     userSettingsStatus.textContent = "";
     userFormMode = mode;
@@ -311,8 +317,16 @@
   }
 
   userSettingsToggle.addEventListener("click", () => {
-    userSettingsPanel.hidden = !userSettingsPanel.hidden;
-    if (!userSettingsPanel.hidden) showUserMenu();
+    userSettingsPanel.hidden = false;
+    showUserMenu();
+  });
+
+  usMenuCancelBtn.addEventListener("click", () => {
+    userSettingsPanel.hidden = true;
+  });
+
+  usListCancelBtn.addEventListener("click", () => {
+    userSettingsPanel.hidden = true;
   });
 
   usEditUserBtn.addEventListener("click", () => showUserList());
