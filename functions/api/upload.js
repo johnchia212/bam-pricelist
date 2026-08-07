@@ -7,6 +7,7 @@ import { getSessionFromRequest, json } from "../_lib/auth.js";
 export async function onRequestPost({ request, env }) {
   const session = await getSessionFromRequest(request, env);
   if (!session) return json({ error: "Unauthorized" }, { status: 401 });
+  if (session.r !== "admin") return json({ error: "Forbidden" }, { status: 403 });
 
   let data;
   try {

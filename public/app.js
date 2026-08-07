@@ -23,12 +23,22 @@
   const addItemStatus = document.getElementById("add-item-status");
   const aiCategory = document.getElementById("ai-category");
   const aiCategoryNew = document.getElementById("ai-category-new");
+  const adminPanel = document.getElementById("admin-panel");
+  const userSettingsToggle = document.getElementById("user-settings-toggle");
+  const userSettingsPanel = document.getElementById("user-settings-panel");
+  const userList = document.getElementById("user-list");
+  const userSettingsForm = document.getElementById("user-settings-form");
+  const usUsername = document.getElementById("us-username");
+  const usPassword = document.getElementById("us-password");
+  const usRole = document.getElementById("us-role");
+  const userSettingsStatus = document.getElementById("user-settings-status");
 
   let pricelist = null;
   let sortState = { key: null, dir: 1 };
   let activeCategory = "";
   let editingKey = null; // `${category}::${index}` of row currently being edited
   let dirty = false;
+  let currentRole = null;
 
   const COLUMNS = [
     { key: "model", label: "Model", editable: true },
@@ -104,7 +114,7 @@
     const res = await fetch("/api/me");
     const data = await res.json();
     if (data.authenticated) {
-      showApp(data.username);
+      showApp(data.username, data.role);
     } else {
       showLogin();
     }
@@ -115,10 +125,25 @@
     appView.hidden = true;
   }
 
-  async function showApp(username) {
+  function applyRolePermissions() {
+    const isAdmin = currentRole === "admin";
+    adminPanel.hidden = !isAdmin;
+    saveBtn.hidden = !isAdmin;
+    userSettingsToggle.hidden = !isAdmin;
+    if (!isAdmin) {
+      userSettingsPanel.hidden = true;
+      addItemPanel.hidden = true;
+    }
+  }
+
+  async function showApp(username, role) {
     loginView.hidden = true;
     appView.hidden = false;
-    whoami.textContent = username ? `Signed in as ${username}` : "";
+    currentRole = role || "admin";
+    whoami.textContent = username
+      ? `Signed in as ${username}${currentRole === "user" ? " (Read-only)" : ""}`
+      : "";
+    applyRolePermissions();
     await loadPricelist();
   }
 
@@ -135,7 +160,7 @@
     const data = await res.json();
     if (res.ok && data.ok) {
       loginForm.reset();
-      showApp(data.username);
+      showApp(data.username, data.role);
     } else {
       loginError.textContent = data.error || "Login failed";
       loginError.hidden = false;
@@ -155,6 +180,66 @@
   uploadFile.addEventListener("change", () => {
     const file = uploadFile.files[0];
     uploadFilename.textContent = file ? file.name : "No file selected";
+  });
+
+  // ---------- User Settings (admin only) ----------
+  async function loadUserList() {
+    userList.innerHTML = '<p class="admin-note">Loading users…</p>';
+    try {
+      const res = await fetch("/api/users");
+      const data = await res.json();
+      if (!res.ok) {
+        userList.innerHTML = `<p class="admin-note">${data.error || "Failed to load users."}</p>`;
+        return;
+      }
+      userList.innerHTML = "";
+      data.users.forEach((u) => {
+        const row = document.createElement("div");
+        row.className = "user-list-item";
+        const roleLabel = u.role === "admin" ? "Admin · Full access" : "User · Read-only";
+        row.innerHTML = `<span>${u.username}</span><span class="user-role-badge">${roleLabel}</span>`;
+        userList.appendChild(row);
+      });
+    } catch (err) {
+      userList.innerHTML = `<p class="admin-note">Failed to load users: ${err.message}</p>`;
+    }
+  }
+
+  userSettingsToggle.addEventListener("click", () => {
+    userSettingsPanel.hidden = !userSettingsPanel.hidden;
+    if (!userSettingsPanel.hidden) loadUserList();
+  });
+
+  userSettingsForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    userSettingsStatus.textContent = "Saving…";
+    userSettingsStatus.className = "upload-status";
+    try {
+      const res = await fetch("/api/users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: usUsername.value.trim(),
+          password: usPassword.value,
+          role: usRole.value,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        userSettingsStatus.textContent = data.error || "Failed to save user.";
+        userSettingsStatus.className = "upload-status err";
+        return;
+      }
+      userSettingsStatus.textContent = `Saved "${usUsername.value.trim()}".`;
+      userSettingsStatus.className = "upload-status ok";
+      usUsername.value = "";
+      usPassword.value = "";
+      usRole.value = "user";
+      loadUserList();
+    } catch (err) {
+      userSettingsStatus.textContent = "Failed to save user: " + err.message;
+      userSettingsStatus.className = "upload-status err";
+    }
   });
 
   // ---------- Load File (local only, does not touch R2) ----------
@@ -550,9 +635,11 @@
         });
         headRow.appendChild(th);
       });
-      const actionsTh = document.createElement("th");
-      actionsTh.textContent = "";
-      headRow.appendChild(actionsTh);
+      if (currentRole === "admin") {
+        const actionsTh = document.createElement("th");
+        actionsTh.textContent = "";
+        headRow.appendChild(actionsTh);
+      }
       thead.appendChild(headRow);
       table.appendChild(thead);
 
@@ -593,6 +680,7 @@
           tr.appendChild(td);
         });
 
+        if (currentRole === "admin") {
         const actionsTd = document.createElement("td");
         actionsTd.className = "actions-cell";
         if (isEditing) {
@@ -654,6 +742,7 @@
           actionsTd.appendChild(editBtn);
         }
         tr.appendChild(actionsTd);
+        }
         tbody.appendChild(tr);
       });
       table.appendChild(tbody);

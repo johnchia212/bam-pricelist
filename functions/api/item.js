@@ -12,6 +12,7 @@ const ALLOWED_FIELDS = [
 export async function onRequestPost({ request, env }) {
   const session = await getSessionFromRequest(request, env);
   if (!session) return json({ error: "Unauthorized" }, { status: 401 });
+  if (session.r !== "admin") return json({ error: "Forbidden" }, { status: 403 });
 
   let body;
   try {
@@ -72,6 +73,7 @@ export async function onRequestPost({ request, env }) {
 export async function onRequestPut({ request, env }) {
   const session = await getSessionFromRequest(request, env);
   if (!session) return json({ error: "Unauthorized" }, { status: 401 });
+  if (session.r !== "admin") return json({ error: "Forbidden" }, { status: 403 });
 
   let body;
   try {

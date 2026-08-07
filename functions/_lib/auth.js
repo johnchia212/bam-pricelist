@@ -79,10 +79,10 @@ export async function getSessionFromRequest(request, env) {
   return verifySession(token, secret);
 }
 
-export async function makeSessionCookie(username, env) {
+export async function makeSessionCookie(username, role, env) {
   const secret = env.SESSION_SECRET || "dev-insecure-secret-change-me";
   const exp = Math.floor(Date.now() / 1000) + SESSION_TTL_SECONDS;
-  const token = await signSession({ u: username, exp }, secret);
+  const token = await signSession({ u: username, r: role, exp }, secret);
   return `${COOKIE_NAME}=${encodeURIComponent(token)}; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=${SESSION_TTL_SECONDS}`;
 }
 
