@@ -407,11 +407,80 @@
   });
 
   // ---------- Export File (download current in-browser state as .xlsx) ----------
-  const EXPORT_HEADERS = [
-    "Series", "Model", "SAP P/N", "Capacity", "Dimensions", "Range",
-    "Weight (kg)", "E.T (mm)", "HCG (mm)", "Mounting Class",
-    "EXW Wuxi (RMB)", "Input Date", "Updated", "Remarks",
+  // Matches the exact column set, header text, fonts, fills, borders, widths
+  // and number formats of the original "Price_2026_Export MASTER" template.
+  // SheetJS's free build can't write cell styles, so this uses ExcelJS instead
+  // (loaded alongside SheetJS, which is still used for reading uploaded files).
+  const EXPORT_HEADER_FILL = "FFA5A5A5";
+  const EXPORT_COLUMNS = [
+    { header: "Attachment Series", key: "series", width: 10.33, align: "center", borderLeft: "medium" },
+    { header: "Model", key: "model", width: 14.5, align: "left" },
+    { header: "SAP P/N", key: "sap_pn", width: 13, align: "left" },
+    { header: "Capacity(kg)/load centre (mm)", key: "capacity", width: 10.33, align: "center" },
+    { header: "Dimensions (mm)", key: "dimensions", width: undefined, align: "center" },
+    { header: "Range (mm)", key: "range", width: 7.66, align: "left" },
+    { header: "Weight (kg)", key: "weight_kg", width: 7.16, align: "center", numFmt: "0" },
+    { header: "E.T (mm)", key: "et_mm", width: 5.83, align: "center" },
+    { header: "HCG (mm)", key: "hcg_mm", width: 6.5, align: "center" },
+    { header: "Mounting class ISO2328", key: "mounting_class", width: 9, align: "center" },
+    { header: "EXW Wuxi P.R.C. (RMB)", key: "price_rmb", width: 10, align: "center", numFmt: "#,##0_ " },
+    { header: "Updated Dated", key: "input_date", width: 9.16, align: "center", numFmt: "d/m/yy;@", isDate: true },
+    { header: "Remarks", key: "remarks", width: 28.83, align: "left", borderRight: "medium" },
   ];
+
+  function dateOnly(v) {
+    if (!v) return null;
+    const d = new Date(v);
+    return Number.isNaN(d.getTime()) ? null : d;
+  }
+
+  async function buildExportWorkbook() {
+    const wb = new ExcelJS.Workbook();
+    const usedNames = new Set();
+    pricelist.categories.forEach((c) => {
+      const ws = wb.addWorksheet(sanitizeSheetName(c.category, usedNames));
+      ws.columns = EXPORT_COLUMNS.map((col) => ({ key: col.key, width: col.width }));
+
+      const headerRow = ws.addRow(EXPORT_COLUMNS.map((col) => col.header));
+      headerRow.height = 25;
+      headerRow.eachCell((cell, colIdx) => {
+        const col = EXPORT_COLUMNS[colIdx - 1];
+        cell.font = { name: "Calibri", size: 8, bold: true };
+        cell.alignment = { horizontal: "center", vertical: "center", wrapText: true };
+        cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: EXPORT_HEADER_FILL } };
+        cell.border = {
+          top: { style: "thin" },
+          bottom: { style: "double" },
+          left: { style: col.borderLeft || "thin" },
+          right: { style: col.borderRight || "thin" },
+        };
+      });
+
+      c.items.forEach((it) => {
+        const values = EXPORT_COLUMNS.map((col) => {
+          if (col.isDate) return dateOnly(it[col.key]);
+          return it[col.key] ?? null;
+        });
+        const row = ws.addRow(values);
+        row.height = 16;
+        row.eachCell({ includeEmpty: true }, (cell, colIdx) => {
+          const col = EXPORT_COLUMNS[colIdx - 1];
+          cell.font = { name: "Calibri", size: 8 };
+          cell.alignment = { horizontal: col.align, vertical: "center", wrapText: true };
+          if (col.numFmt) cell.numFmt = col.numFmt;
+          cell.border = {
+            top: { style: "thin" },
+            bottom: { style: "thin" },
+            left: { style: col.borderLeft || "thin" },
+            right: { style: col.borderRight || "thin" },
+          };
+        });
+      });
+
+      ws.views = [{ state: "frozen", ySplit: 1 }];
+    });
+    return wb;
+  }
 
   function sanitizeSheetName(name, used) {
     let clean = String(name || "Sheet").replace(/[:\\/?*\[\]]/g, "-").slice(0, 31);
@@ -427,39 +496,26 @@
     return final;
   }
 
-  exportFileBtn.addEventListener("click", () => {
+  exportFileBtn.addEventListener("click", async () => {
     if (!pricelist || !pricelist.categories.length) {
       setUploadStatus("Nothing to export yet.", "err");
       return;
     }
     try {
-      const wb = XLSX.utils.book_new();
-      const usedNames = new Set();
-      pricelist.categories.forEach((c) => {
-        const rows = [EXPORT_HEADERS];
-        c.items.forEach((it) => {
-          rows.push([
-            it.series ?? "",
-            it.model ?? "",
-            it.sap_pn ?? "",
-            it.capacity ?? "",
-            it.dimensions ?? "",
-            it.range ?? "",
-            it.weight_kg ?? "",
-            it.et_mm ?? "",
-            it.hcg_mm ?? "",
-            it.mounting_class ?? "",
-            it.price_rmb ?? "",
-            fmtDate(it.input_date),
-            fmtDate(it.updated),
-            it.remarks ?? "",
-          ]);
-        });
-        const ws = XLSX.utils.aoa_to_sheet(rows);
-        XLSX.utils.book_append_sheet(wb, ws, sanitizeSheetName(c.category, usedNames));
+      const wb = await buildExportWorkbook();
+      const buffer = await wb.xlsx.writeBuffer();
+      const blob = new Blob([buffer], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       });
       const stamp = new Date().toISOString().slice(0, 10);
-      XLSX.writeFile(wb, `BAM_Pricelist_${stamp}.xlsx`);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `BAM_Pricelist_${stamp}.xlsx`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
       setUploadStatus("Exported to Excel.", "ok");
     } catch (err) {
       setUploadStatus("Export failed: " + err.message, "err");
