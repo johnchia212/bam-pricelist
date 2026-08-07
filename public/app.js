@@ -24,17 +24,20 @@
   const aiCategory = document.getElementById("ai-category");
   const aiCategoryNew = document.getElementById("ai-category-new");
   const adminPanel = document.getElementById("admin-panel");
+  const loadFileGroup = document.getElementById("load-file-group");
   const userSettingsToggle = document.getElementById("user-settings-toggle");
   const userSettingsPanel = document.getElementById("user-settings-panel");
+  const userSettingsMenu = document.getElementById("user-settings-menu");
+  const usEditUserBtn = document.getElementById("us-edit-user-btn");
+  const usAddUserBtn = document.getElementById("us-add-user-btn");
   const userList = document.getElementById("user-list");
   const userSettingsForm = document.getElementById("user-settings-form");
   const usUsername = document.getElementById("us-username");
   const usPassword = document.getElementById("us-password");
   const usRole = document.getElementById("us-role");
-  const usSaveBtn = document.getElementById("us-save-btn");
-  const usAddBtn = document.getElementById("us-add-btn");
+  const usSubmitBtn = document.getElementById("us-submit-btn");
+  const usSubmitLabel = document.getElementById("us-submit-label");
   const userSettingsStatus = document.getElementById("user-settings-status");
-  let knownUsernames = [];
 
   let pricelist = null;
   let sortState = { key: null, dir: 1 };
@@ -42,6 +45,7 @@
   let editingKey = null; // `${category}::${index}` of row currently being edited
   let dirty = false;
   let currentRole = null;
+  let userFormMode = null; // "add" or "edit"
 
   const COLUMNS = [
     { key: "model", label: "Model", editable: true },
@@ -128,14 +132,22 @@
     appView.hidden = true;
   }
 
+  function canWrite() {
+    return currentRole === "admin" || currentRole === "manager";
+  }
+
   function applyRolePermissions() {
     const isAdmin = currentRole === "admin";
-    adminPanel.hidden = !isAdmin;
-    saveBtn.hidden = !isAdmin;
+    const write = canWrite();
+    adminPanel.hidden = !write;
+    saveBtn.hidden = !write;
+    loadFileGroup.hidden = !isAdmin;
     userSettingsToggle.hidden = !isAdmin;
+    if (!write) {
+      addItemPanel.hidden = true;
+    }
     if (!isAdmin) {
       userSettingsPanel.hidden = true;
-      addItemPanel.hidden = true;
     }
   }
 
@@ -143,9 +155,9 @@
     loginView.hidden = true;
     appView.hidden = false;
     currentRole = role || "admin";
-    whoami.textContent = username
-      ? `Signed in as ${username}${currentRole === "user" ? " (Read-only)" : ""}`
-      : "";
+    const roleSuffix =
+      currentRole === "user" ? " (Read-only)" : currentRole === "manager" ? " (Manager)" : "";
+    whoami.textContent = username ? `Signed in as ${username}${roleSuffix}` : "";
     applyRolePermissions();
     await loadPricelist();
   }
@@ -186,6 +198,47 @@
   });
 
   // ---------- User Settings (admin only) ----------
+  function roleLabelFor(role) {
+    if (role === "admin") return "Admin · Full access";
+    if (role === "manager") return "Manager · Add, edit, export";
+    return "User · Read-only";
+  }
+
+  function showUserMenu() {
+    userSettingsMenu.hidden = false;
+    userList.hidden = true;
+    userSettingsForm.hidden = true;
+    userSettingsStatus.textContent = "";
+  }
+
+  function showUserList() {
+    userSettingsMenu.hidden = true;
+    userList.hidden = false;
+    userSettingsForm.hidden = true;
+    loadUserList();
+  }
+
+  function showUserForm(mode, user) {
+    userSettingsMenu.hidden = true;
+    userList.hidden = true;
+    userSettingsForm.hidden = false;
+    userSettingsStatus.textContent = "";
+    userFormMode = mode;
+    if (mode === "edit" && user) {
+      usUsername.value = user.username;
+      usUsername.disabled = true;
+      usPassword.value = "";
+      usRole.value = user.role;
+      usSubmitLabel.textContent = "Save Changes";
+    } else {
+      usUsername.value = "";
+      usUsername.disabled = false;
+      usPassword.value = "";
+      usRole.value = "user";
+      usSubmitLabel.textContent = "Add User";
+    }
+  }
+
   async function loadUserList() {
     userList.innerHTML = '<p class="admin-note">Loading users…</p>';
     try {
@@ -196,12 +249,51 @@
         return;
       }
       userList.innerHTML = "";
-      knownUsernames = data.users.map((u) => u.username.toLowerCase());
       data.users.forEach((u) => {
         const row = document.createElement("div");
         row.className = "user-list-item";
-        const roleLabel = u.role === "admin" ? "Admin · Full access" : "User · Read-only";
-        row.innerHTML = `<span>${u.username}</span><span class="user-role-badge">${roleLabel}</span>`;
+
+        const info = document.createElement("span");
+        info.textContent = `${u.username}  `;
+        const badge = document.createElement("span");
+        badge.className = "user-role-badge";
+        badge.textContent = roleLabelFor(u.role);
+        info.appendChild(badge);
+
+        const actions = document.createElement("span");
+        actions.className = "user-list-item-actions";
+        const editBtn = document.createElement("button");
+        editBtn.type = "button";
+        editBtn.className = "btn-tiny";
+        editBtn.textContent = "Edit";
+        editBtn.addEventListener("click", () => showUserForm("edit", u));
+        const deleteBtn = document.createElement("button");
+        deleteBtn.type = "button";
+        deleteBtn.className = "btn-tiny btn-tiny-danger";
+        deleteBtn.textContent = "Delete";
+        deleteBtn.addEventListener("click", async () => {
+          if (!confirm(`Delete user "${u.username}"? This cannot be undone.`)) return;
+          try {
+            const delRes = await fetch("/api/users", {
+              method: "DELETE",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ username: u.username }),
+            });
+            const delData = await delRes.json();
+            if (!delRes.ok || !delData.ok) {
+              alert(delData.error || "Failed to delete user.");
+              return;
+            }
+            loadUserList();
+          } catch (err) {
+            alert("Failed to delete user: " + err.message);
+          }
+        });
+        actions.appendChild(editBtn);
+        actions.appendChild(deleteBtn);
+
+        row.appendChild(info);
+        row.appendChild(actions);
         userList.appendChild(row);
       });
     } catch (err) {
@@ -211,10 +303,13 @@
 
   userSettingsToggle.addEventListener("click", () => {
     userSettingsPanel.hidden = !userSettingsPanel.hidden;
-    if (!userSettingsPanel.hidden) loadUserList();
+    if (!userSettingsPanel.hidden) showUserMenu();
   });
 
-  async function submitUser(mode) {
+  usEditUserBtn.addEventListener("click", () => showUserList());
+  usAddUserBtn.addEventListener("click", () => showUserForm("add"));
+
+  usSubmitBtn.addEventListener("click", async () => {
     const username = usUsername.value.trim();
     const password = usPassword.value;
     const role = usRole.value;
@@ -224,19 +319,13 @@
       userSettingsStatus.className = "upload-status err";
       return;
     }
-    if (!password || password.length < 6) {
+    if (userFormMode === "add" && !password) {
+      userSettingsStatus.textContent = "Password is required for a new user.";
+      userSettingsStatus.className = "upload-status err";
+      return;
+    }
+    if (password && password.length < 6) {
       userSettingsStatus.textContent = "Password must be at least 6 characters.";
-      userSettingsStatus.className = "upload-status err";
-      return;
-    }
-    const exists = knownUsernames.includes(username.toLowerCase());
-    if (mode === "save" && !exists) {
-      userSettingsStatus.textContent = `No existing user named "${username}" — use Add User to create one.`;
-      userSettingsStatus.className = "upload-status err";
-      return;
-    }
-    if (mode === "add" && exists) {
-      userSettingsStatus.textContent = `"${username}" already exists — use Save User to update them.`;
       userSettingsStatus.className = "upload-status err";
       return;
     }
@@ -247,7 +336,7 @@
       const res = await fetch("/api/users", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password, role }),
+        body: JSON.stringify({ username, password: password || undefined, role }),
       });
       const data = await res.json();
       if (!res.ok || !data.ok) {
@@ -256,6 +345,7 @@
         return;
       }
       usUsername.value = "";
+      usUsername.disabled = false;
       usPassword.value = "";
       usRole.value = "user";
       userSettingsStatus.textContent = "";
@@ -264,10 +354,7 @@
       userSettingsStatus.textContent = "Failed to save user: " + err.message;
       userSettingsStatus.className = "upload-status err";
     }
-  }
-
-  usSaveBtn.addEventListener("click", () => submitUser("save"));
-  usAddBtn.addEventListener("click", () => submitUser("add"));
+  });
 
   // ---------- Load File (local only, does not touch R2) ----------
   loadFileBtn.addEventListener("click", async () => {
@@ -663,7 +750,7 @@
         });
         headRow.appendChild(th);
       });
-      if (currentRole === "admin") {
+      if (canWrite()) {
         const actionsTh = document.createElement("th");
         actionsTh.textContent = "";
         headRow.appendChild(actionsTh);
@@ -708,7 +795,7 @@
           tr.appendChild(td);
         });
 
-        if (currentRole === "admin") {
+        if (canWrite()) {
         const actionsTd = document.createElement("td");
         actionsTd.className = "actions-cell";
         if (isEditing) {
@@ -739,26 +826,28 @@
             editingKey = null;
             render();
           });
-          const deleteBtn = document.createElement("button");
-          deleteBtn.className = "btn-tiny btn-tiny-danger";
-          deleteBtn.textContent = "Delete";
-          deleteBtn.addEventListener("click", () => {
-            const label = it.model || "this item";
-            if (!confirm(`Delete "${label}" from "${c.category}"? This cannot be undone once saved.`)) return;
-            const realCat = pricelist.categories.find((cc) => cc.category === c.category);
-            const idx = realCat.items.indexOf(it);
-            if (idx !== -1) realCat.items.splice(idx, 1);
-            realCat.items.forEach((row, i) => (row._idx = i));
-            realCat.count = realCat.items.length;
-            pricelist.total_items = pricelist.categories.reduce((sum, cc) => sum + cc.items.length, 0);
-            editingKey = null;
-            renderTabs();
-            render();
-            markDirty();
-          });
           actionsTd.appendChild(updateBtn);
           actionsTd.appendChild(cancelBtn);
-          actionsTd.appendChild(deleteBtn);
+          if (currentRole === "admin") {
+            const deleteBtn = document.createElement("button");
+            deleteBtn.className = "btn-tiny btn-tiny-danger";
+            deleteBtn.textContent = "Delete";
+            deleteBtn.addEventListener("click", () => {
+              const label = it.model || "this item";
+              if (!confirm(`Delete "${label}" from "${c.category}"? This cannot be undone once saved.`)) return;
+              const realCat = pricelist.categories.find((cc) => cc.category === c.category);
+              const idx = realCat.items.indexOf(it);
+              if (idx !== -1) realCat.items.splice(idx, 1);
+              realCat.items.forEach((row, i) => (row._idx = i));
+              realCat.count = realCat.items.length;
+              pricelist.total_items = pricelist.categories.reduce((sum, cc) => sum + cc.items.length, 0);
+              editingKey = null;
+              renderTabs();
+              render();
+              markDirty();
+            });
+            actionsTd.appendChild(deleteBtn);
+          }
         } else {
           const editBtn = document.createElement("button");
           editBtn.className = "btn-tiny";

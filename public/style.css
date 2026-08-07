@@ -235,6 +235,8 @@ body {
   cursor: pointer;
 }
 .upload-filename { color: var(--grey); font-size: 12px; }
+.load-file-group { display: contents; }
+.user-list-item-actions { display: flex; gap: 6px; }
 .user-list { margin-bottom: 16px; max-width: 460px; }
 .user-list-item {
   display: flex;

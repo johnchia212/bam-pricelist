@@ -44,10 +44,10 @@ export async function saveUsers(env, users) {
 }
 
 // Creates a new user, or updates the password/role of an existing one
-// (matched case-insensitively on username).
-export async function upsertUser(env, { username, password, role }) {
+// (matched case-insensitively on username). Caller is responsible for
+// hashing the password (or reusing an existing hash when it isn't changing).
+export async function upsertUser(env, { username, passwordHash, role }) {
   const users = await getUsers(env);
-  const passwordHash = await hashPassword(password);
   const idx = users.findIndex((u) => u.username.toLowerCase() === username.toLowerCase());
   if (idx !== -1) {
     users[idx] = { username: users[idx].username, passwordHash, role };
@@ -56,4 +56,27 @@ export async function upsertUser(env, { username, password, role }) {
   }
   await saveUsers(env, users);
   return users;
+}
+
+// Removes a user. Refuses to remove the last remaining Admin account so the
+// app can never end up with nobody able to manage users.
+export async function deleteUser(env, username) {
+  const users = await getUsers(env);
+  const target = users.find((u) => u.username.toLowerCase() === username.toLowerCase());
+  if (!target) {
+    const err = new Error("User not found");
+    err.status = 404;
+    throw err;
+  }
+  const remainingAdmins = users.filter(
+    (u) => u.role === "admin" && u.username.toLowerCase() !== username.toLowerCase()
+  );
+  if (target.role === "admin" && remainingAdmins.length === 0) {
+    const err = new Error("Cannot delete the only Admin account.");
+    err.status = 400;
+    throw err;
+  }
+  const updated = users.filter((u) => u.username.toLowerCase() !== username.toLowerCase());
+  await saveUsers(env, updated);
+  return updated;
 }
